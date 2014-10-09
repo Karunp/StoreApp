@@ -1,0 +1,105 @@
+﻿@model StoreOwnerApp.Models.Store
+
+@{
+    ViewBag.Title = "StoreHome";
+}
+
+<h2>StoreHome</h2>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+<div id="map-canvas" style="width:600px;height:400px"></div>
+
+<script type="text/javascript" >
+    //var data = {
+    //    "status": "ok",
+    //    "locations": [
+    //      {
+    //          "lat": 40.714240,
+    //          "lng": -74.006420,
+    //          "id": "AKbP5WJC",
+    //          "name": "GiftScrap",
+    //          "store_id": "fKMwx5FG"
+    //      },
+    //      {
+    //          "lat": 40.716853,
+    //          "lng": -74.008153,
+    //          "id": "qKIDhc8g",
+    //          "name": "American Apparel",
+    //          "store_id": "fKAKgREd"
+    //      },
+    //      {
+    //          "lat": 40.714897,
+    //          "lng": -74.009261,
+    //          "id": "0fkdPEPC",
+    //          "name": "Babesta",
+    //          "store_id": "AAAVej36"
+    //      },
+    //      {
+    //          "lat": 40.714897,
+    //          "lng": -74.009261,
+    //          "id": "AfhfiAR8",
+    //          "name": "Babesta",
+    //          "store_id": "AAAVej36"
+    //      },
+    //      {
+    //          "lat": 40.718005,
+    //          "lng": -74.005404,
+    //          "id": "qKbUUAHV",
+    //          "name": "OK Uniform Co., Inc.",
+    //          "store_id": "0ffKBsDW"
+    //      },
+    //    ],
+    //    "time": 0.991773
+    //}
+    function getLocations(callback) {
+        
+        var url = 'http://api.goodzer.com/products/v0.1/search_locations/?query=v-neck+sweater&lat=40.714353&lng=-74.005973 &radius=5.0&priceRange=30:120&apiKey=f7d93213c281896d44c093a36a4f544a&callback=?';
+        $.getJSON(url, callback)   
+
+    }
+    var map;
+    var marker;
+    function initialize() {
+        var url = 'http://api.goodzer.com/products/v0.1/search_locations/?query=v-neck+sweater&lat=40.714353&lng=-74.005973 &radius=5.0&priceRange=30:120&apiKey=f7d93213c281896d44c093a36a4f544a&callback=?';
+
+        var mapOptions = {
+            zoom: 8,
+            center: new google.maps.LatLng(-34.397, 150.644)
+        };
+        map = new google.maps.Map(document.getElementById('map-canvas'),
+            mapOptions);
+
+       
+
+        //getLocations(function (data) {
+        //    var locations = data.locations;
+        //    var location;
+        //    for (i in locations) {
+        //        location = locations[i];
+        //        var latLng = new google.maps.LatLng(location.lat, location.lng);
+        //        var marker = new google.maps.Marker({
+        //            position: latLng,
+        //            map: map,
+        //            title: location.name
+        //        });
+        //        marker.setMap(map);
+        //    }
+        //});
+    }
+
+   
+    google.maps.event.addDomListener(window, 'load', initialize);
+    $(document).ready(function () {
+        $.getJSON('http://api.goodzer.com/products/v0.1/location_details/?locationId=VKW3QQKA&apiKey=f7d93213c281896d44c093a36a4f544a&callback=?', function (json1) {
+            $.each(json1, function (key, data) {
+                var latLng = new google.maps.LatLng(data.lat, data.lng);
+                // Creating a marker and putting it on the map
+                var marker = new google.maps.Marker({
+                    position: latLng,
+                    title: data.title
+                });
+            });
+        });
+    });
+
+</script>
+ 

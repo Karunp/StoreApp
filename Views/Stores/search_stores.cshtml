@@ -1,0 +1,80 @@
+﻿
+@{
+    ViewBag.Title = "search_stores";
+}
+
+<h2>search_stores</h2>
+
+@foreach (dynamic item in Model)
+{
+    <li>
+        <h5>
+            @item.name
+        </h5>
+        <h5>
+            @item.store_id
+        </h5>
+        <h5>
+            @item.lat
+        </h5>
+    </li>
+}
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script type="text/javascript"src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+<div id="map-canvas" style="width:600px;height:400px"></div>
+
+<script>
+    $(document).ready(function () {
+        //declare a variable
+        var myMarkers = [];
+
+        $.ajax({
+            async: true,
+            type: "POST",
+            dataType: "json",
+            url: '@Url.Action("search_stores_post", "Stores")',
+            data:'{}',
+            success:function(result){
+                //get address from controller action.....
+                myMarkers = result.jResult;
+            }
+
+        });
+        //init google map
+        function googleMap() {
+            var mapOptions = {
+                center: new google.maps.LatLng(myMarkers["lat"], myMarkers["lng"]),
+                zoom: 2,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            var infoWindow = new google.maps.InfoWindow();
+            var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+            for (i = 0; i < myMarkers.length; i++) {
+                data = myMarkers[i];
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(data.lat, data.lng),
+                    map: map
+                });
+                (function (marker, data) {
+                    google.maps.event.addListener(marker, "click", function (e) {
+                        infoWindow.setContent(data.Description);
+                        infoWindow.open(map, marker);
+                    });
+                })(marker, data);
+            }
+        }
+        google.maps.event.addDomListener(window, 'load', googleMap);
+
+    })
+          
+
+</script>
+
+
+
+
+
+
+
+
+  

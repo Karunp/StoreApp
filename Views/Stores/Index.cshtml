@@ -1,0 +1,55 @@
+﻿@model IEnumerable<StoreOwnerApp.Models.Store>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create") |   
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Address)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Address)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.StoreId }) |
+            @Html.ActionLink("View Profile", "StoreDetails", new { id=item.StoreId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.StoreId })
+        </td>
+    </tr>
+}
+
+</table>
+
+<script type="text/javascript">
+      function init_map(map_canvas_id, lat, lng, zoomLevel) {
+         var myLatLng = new google.maps.LatLng(lat, lng);
+
+         var options = {
+            zoom: zoomLevel,
+            center: myLatLng,
+            mapTypeId: google.maps.MapTypeId.HYBRID
+         };
+
+         var map_canvas = document.getElementById(map_canvas_id);
+
+         var map = new google.maps.Map(map_canvas, options);
+      }
+</script>

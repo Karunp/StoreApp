@@ -1,0 +1,245 @@
+﻿@model StoreOwnerApp.Models.Store
+
+@{
+    ViewBag.Title = "StoreDetails";
+}
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyArIHSLWrq4TrnoUmkplpbIillbYCc1GZg"></script>
+<h2>StoreDetails</h2>
+
+@*do not delete this - uncommented for testing*@
+@*<div>
+    <h4>Store</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+
+    </dl>
+
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.User.FirstName)
+        </dt>
+
+        <dt>
+            @Html.DisplayFor(model => model.User.FirstName)
+        </dt>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.User.LastName)
+        </dt>
+
+        <dt>
+            @Html.DisplayFor(model => model.User.LastName)
+        </dt>
+    </dl>
+</div>
+
+@foreach (var item in Model.Products)
+{
+    <p>
+        @Html.DisplayFor(modelitem => item.Name)
+    </p>
+
+    <p>
+        @Html.DisplayFor(modelitem => item.Description)
+    </p>
+}
+@Html.HiddenFor(model => model.StoreId)*@
+
+<div id="travel_selector">
+    <form action="#">
+        <input id="fromInput" type="text" name="from" value=@Model.Address.ToString()>
+        <input id="toInput" type="text" name="to" value="@ViewBag.myAddress" />
+        <input type="submit" name="find" onclick="getDistance()" />
+        <strong>Mode of Travel: </strong>
+        <select id="travelType" onchange="getDistance(fromInput,toInput);">
+            <option value="WALKING">Walking</option>
+            <option value="BICYCLING">Bicycling</option>
+            <option value="DRIVING">Driving</option>
+            <option value="TRANSIT">Transit</option>
+
+        </select>
+       
+    </form>
+
+       
+   
+</div>
+        
+<div id="map-canvas" style="width:600px;height:400px"></div>
+
+<div id="status"></div>
+
+
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.StoreId }) |
+    @Html.ActionLink("Back to List", "Index") | @Html.ActionLink("Add new product", "AddProduct", new { id = Model.StoreId})
+</p>
+
+
+
+<script>    
+    var map;
+    var polyShape;
+    var polygonMode;
+    var polyPoints = [];
+    var marker;
+    var address1 = "";
+    var address2 = "";
+
+    var lastClickTime;
+    var clckTimeOut;
+
+    var fillColor = "#0000FF"; // blue fill
+    var lineColor = "#FF0000"; // black line
+    var opacity = 1;
+    var lineWeight = 4;
+    var options = {
+        showOnLoad: true
+    };
+    var geocoder1 = null;
+    var geocoder2 = null;
+    var fromMarker;
+    var toMarker;
+    var start_point = new google.maps.LatLng(40, -112);
+
+    var from = null;
+    var to = null;;
+
+    var directionsDisplay;
+    var directionsService = new google.maps.DirectionsService();
+
+    if (!google.maps.Polyline.prototype.getBounds)
+        google.maps.Polyline.prototype.getBounds = function () {
+
+            var path = this.getPath();
+
+            var slat, blat = path.getAt(0).lat();
+            var slng, blng = path.getAt(0).lng();
+
+            for (var i = 1; i < path.getLength() ; i++) {
+                var e = path.getAt(i);
+                slat = ((slat < e.lat()) ? slat : e.lat());
+                blat = ((blat > e.lat()) ? blat : e.lat());
+                slng = ((slng < e.lng()) ? slng : e.lng());
+                blng = ((blng > e.lng()) ? blng : e.lng());
+            }
+
+            return new google.maps.LatLngBounds(new google.maps.LatLng(slat, slng), new google.maps.LatLng(blat, blng));
+
+        }
+
+
+    function initialize() {
+        directionsDisplay = new google.maps.DirectionsRenderer();
+        var myOptions = {
+            zoom: 5,
+            center: start_point,
+            mapTypeId: 'roadmap'
+        }
+        map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+        geocoder1 = new google.maps.Geocoder();
+        geocoder2 = new google.maps.Geocoder();
+        directionsDisplay.setMap(map);
+        //if (address1.length > 0 && address2.length > 0) getDistance();
+    }
+
+    function getDistance() { 
+        polyShape = new google.maps.Polyline({
+            path: polyPoints,
+            strokeColor: lineColor,
+            strokeOpacity: opacity,
+            strokeWeight: lineWeight
+        });
+        address1 = document.getElementById("fromInput").value;
+        address2 = document.getElementById("toInput").value;
+        //if (geocoder1) {
+
+            geocoder1.geocode({ 'address': address1 },
+                function (response, status) {
+                    if (!response || status != google.maps.GeocoderStatus.OK) {
+                        alert(address + " not found");
+                    }
+                    else {
+                        var l = response[0];//choose first location
+                        from = l.geometry.location;
+
+                        //fromMarker = new google.maps.Marker({
+                        //    position: from,
+                        //    map: map,
+                        //    title: "From Address"
+                        //});
+                        
+                        //polyShape.setMap(map);
+
+                        //drawLine();
+                        //if (to) drawLine();
+                    }
+                }
+            );
+        //} else alert("Sorry a error hass occured");
+
+        //if (geocoder2) {
+
+            geocoder2.geocode({ 'address': address2 },
+                function (response, status) {
+                    if (!response || status != google.maps.GeocoderStatus.OK) {
+                        alert(address + " not found");
+                    }
+                    else {
+                        var l = response[0];//choose first location
+                        to = l.geometry.location;
+
+                        //toMarker = new google.maps.Marker({
+                        //    position: to,
+                        //    map: map,
+                        //    title: "Searched Address"
+                        //});
+                      
+                    }
+                }
+            );
+            drawLine();
+
+        //} else alert("Sorry a error hass occured");
+            var selectedmode = document.getElementById('travelType').value;
+            var request = {
+                origin: to,
+                destination: from,
+                travelMode: google.maps.TravelMode[selectedmode]
+            }
+
+            directionsService.route(request, function (response, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    directionsDisplay.setDirections(response);
+                }
+            });            
+    }    
+
+    function drawLine() {       
+        //math
+        var length = google.maps.geometry.spherical.computeDistanceBetween(to, from);
+        var km = length / 1000;
+        var miles = length * 0.000621371192;
+        var feet = miles * 5280;
+        document.getElementById("status").innerHTML = "Distance: " + miles.toFixed(2) + " miles , " + km.toFixed(2) + " kilometers (km) , " + feet.toFixed(0) + " feet , " + length.toFixed(0) + " meters";
+      
+    }    
+    google.maps.event.addDomListener(window, 'load', initialize);
+
+</script>
