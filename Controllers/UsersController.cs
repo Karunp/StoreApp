@@ -22,6 +22,20 @@ namespace StoreOwnerApp.Controllers
             return View(db.Users.ToList());
         }
 
+        public ActionResult ProductDetails(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Product product = db.Products.Find(id);
+            if (product == null)
+            {
+                return HttpNotFound();
+            }
+            return View(product);
+        }
+
         public ActionResult UserDetails(string id)
         {
             char[] commaSeparator = new char[] { ',' };
@@ -57,8 +71,29 @@ namespace StoreOwnerApp.Controllers
             return View(user);
         }
 
+
+        public ActionResult AddCategory()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult AddCategory(Category category)
+        {
+            if (ModelState.IsValid)
+            {
+                db.Categories.Add(category);
+                db.SaveChanges();
+                return RedirectToAction("Index");
+
+            }
+            return View(category);
+        }
+
+
         public ActionResult AddProduct()
         {
+            ViewBag.categoryid = new SelectList(db.Categories, "CategoryId", "Name");
             //var curuser = db.Users.Find(User.Identity.GetUserId());
             //ViewBag.isSelling = curuser.isSelling;
             return View();
@@ -77,11 +112,14 @@ namespace StoreOwnerApp.Controllers
                 //    //TODO add product here 
                 //}
                 product.User = curuser;
-                product.StoreId = 7;
+                product.StoreId = 9;
                 db.Products.Add(product);
                 db.SaveChanges();
                 return RedirectToAction("Index");
+
             }
+            ViewBag.categoryid = new SelectList(db.Categories, "CategoryId", "Name", product.CategoryId);
+
             return View(product);
         }
 

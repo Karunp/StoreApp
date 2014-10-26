@@ -37,6 +37,11 @@
 
     </dl>
 </div>
+@foreach (var product in Model.Products)
+{
+    @Html.ActionLink(product.Name, "ProductDetails", new { id = product.ProductId })
+
+}
 <p>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")

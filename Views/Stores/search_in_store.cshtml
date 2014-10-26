@@ -1,0 +1,20 @@
+﻿
+@{
+    ViewBag.Title = "search_in_store";
+}
+
+<h2>search_in_store</h2>
+
+
+@foreach (dynamic item in Model)
+{
+    <li>
+        <h5>
+            @item.id
+        </h5>
+        <h5>
+            @item.title
+        </h5>
+
+    </li>
+}

@@ -44,6 +44,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PagedList">
+      <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -181,6 +184,8 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\OrderDetailsController.cs" />
+    <Compile Include="Controllers\ShoppingCartsController.cs" />
     <Compile Include="Controllers\StoresApiController.cs" />
     <Compile Include="Controllers\StoresController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
@@ -239,16 +244,55 @@
     <Compile Include="Migrations\201410072222504_modelupdates.Designer.cs">
       <DependentUpon>201410072222504_modelupdates.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201410142229306_newmodels.cs" />
+    <Compile Include="Migrations\201410142229306_newmodels.Designer.cs">
+      <DependentUpon>201410142229306_newmodels.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201410142236300_newmode.cs" />
+    <Compile Include="Migrations\201410142236300_newmode.Designer.cs">
+      <DependentUpon>201410142236300_newmode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201410142239104_newmod.cs" />
+    <Compile Include="Migrations\201410142239104_newmod.Designer.cs">
+      <DependentUpon>201410142239104_newmod.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201410150007513_newmo.cs" />
+    <Compile Include="Migrations\201410150007513_newmo.Designer.cs">
+      <DependentUpon>201410150007513_newmo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201410150228577_newm.cs" />
+    <Compile Include="Migrations\201410150228577_newm.Designer.cs">
+      <DependentUpon>201410150228577_newm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201410152121459_testingshit.cs" />
+    <Compile Include="Migrations\201410152121459_testingshit.Designer.cs">
+      <DependentUpon>201410152121459_testingshit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201410152155030_testingshi.cs" />
+    <Compile Include="Migrations\201410152155030_testingshi.Designer.cs">
+      <DependentUpon>201410152155030_testingshi.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201410261804279_changedproductmode.cs" />
+    <Compile Include="Migrations\201410261804279_changedproductmode.Designer.cs">
+      <DependentUpon>201410261804279_changedproductmode.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AllowCrossSiteJsonAttribute.cs" />
+    <Compile Include="Models\Cart.cs" />
+    <Compile Include="Models\Category.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Location.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\Order.cs" />
+    <Compile Include="Models\OrderDetail.cs" />
     <Compile Include="Models\Product.cs" />
+    <Compile Include="Models\ShoppingCart.cs" />
     <Compile Include="Models\Store.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\ShoppingCartRemoveViewModel.cs" />
+    <Compile Include="ViewModels\ShoppingCartViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
@@ -260,6 +304,8 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\bootstrapPager.js" />
+    <Content Include="Scripts\bootstrapPager.min.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
@@ -329,9 +375,27 @@
     <Content Include="Views\Stores\get_store.cshtml" />
     <Content Include="Views\Stores\location_details.cshtml" />
     <Content Include="Views\Stores\location_details_api.cshtml" />
+    <Content Include="Views\Carts\Create.cshtml" />
+    <Content Include="Views\Carts\Delete.cshtml" />
+    <Content Include="Views\Carts\Details.cshtml" />
+    <Content Include="Views\Carts\Edit.cshtml" />
+    <Content Include="Views\Carts\Index.cshtml" />
+    <Content Include="Views\OrderDetails\Create.cshtml" />
+    <Content Include="Views\OrderDetails\Delete.cshtml" />
+    <Content Include="Views\OrderDetails\Details.cshtml" />
+    <Content Include="Views\OrderDetails\Edit.cshtml" />
+    <Content Include="Views\OrderDetails\Index.cshtml" />
+    <Content Include="Views\ShoppingCart\Index.cshtml" />
+    <Content Include="Views\Users\AddCategory.cshtml" />
+    <Content Include="Views\Stores\storeproducts.cshtml" />
+    <Content Include="Views\Stores\search_in_store.cshtml" />
+    <Content Include="Views\Stores\Browse.cshtml" />
+    <Content Include="Views\Stores\ProductDetails.cshtml" />
+    <Content Include="Views\Users\ProductDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\ShoppingCarts\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -379,6 +443,30 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201410072222504_modelupdates.resx">
       <DependentUpon>201410072222504_modelupdates.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410142229306_newmodels.resx">
+      <DependentUpon>201410142229306_newmodels.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410142236300_newmode.resx">
+      <DependentUpon>201410142236300_newmode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410142239104_newmod.resx">
+      <DependentUpon>201410142239104_newmod.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410150007513_newmo.resx">
+      <DependentUpon>201410150007513_newmo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410150228577_newm.resx">
+      <DependentUpon>201410150228577_newm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410152121459_testingshit.resx">
+      <DependentUpon>201410152121459_testingshit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410152155030_testingshi.resx">
+      <DependentUpon>201410152155030_testingshi.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410261804279_changedproductmode.resx">
+      <DependentUpon>201410261804279_changedproductmode.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

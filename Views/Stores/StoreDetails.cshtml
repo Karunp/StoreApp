@@ -1,10 +1,12 @@
 ﻿@model StoreOwnerApp.Models.Store
 
+         
 @{
     ViewBag.Title = "StoreDetails";
 }
 
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyArIHSLWrq4TrnoUmkplpbIillbYCc1GZg"></script>
+@*<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyArIHSLWrq4TrnoUmkplpbIillbYCc1GZg"></script>*@
+
 <h2>StoreDetails</h2>
 
 @*do not delete this - uncommented for testing*@
@@ -61,7 +63,140 @@
 }
 @Html.HiddenFor(model => model.StoreId)*@
 
-<div id="travel_selector">
+    @using (Html.BeginForm("StoreDetails", "Stores", FormMethod.Get))
+    {
+            <h5>Page (@ViewBag.pagecount < @ViewBag.pageNumber ? 0 : @ViewBag.pageNumber of @ViewBag.pagecount)</h5>
+        
+        <p>
+            <input type="hidden" value=@ViewBag.pageNumber />
+            Title: @Html.TextBox("productname")
+            FromPrice: @Html.TextBox("fromPrice")
+            ToPrice: @Html.TextBox("toPrice")
+            <input type="submit" value="Filter" />
+        </p>
+        
+        if (ViewBag.myModel != null)
+        {
+           <h5>Found @ViewBag.modelcount Products Online</h5>
+            <table id="example" class="table table-striped">
+       
+            <tr>
+                <th>
+                    Image
+                </th>
+                <th>
+                    
+                    Title
+                </th>
+                <th>
+                    Price
+                </th>
+
+            </tr>
+       
+       
+            @foreach (dynamic item in ViewBag.myModel)
+            {
+                <tr>
+
+                    <td>
+                        <img src="@item.image">
+
+                    </td>
+                    <td>
+                        @item.title
+
+                    </td>
+                    <td>
+                        @item.Price
+                    </td>
+
+                </tr>
+            }
+    </table>
+        <div>
+            @if (ViewBag.prevpage)
+            {
+                @Html.ActionLink("<<", "StoreDetails", new { page = 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice })
+                @Html.Raw(" ");
+                @Html.ActionLink("< Prev", "StoreDetails", new { page = ViewBag.pagenumber - 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice })
+            }
+            else
+            {
+                @:<<
+                @Html.Raw(" ");
+                @:< Prev
+            }
+
+            @if (ViewBag.nextpage)
+            {
+                @Html.ActionLink("Next >", "StoreDetails", new { page = ViewBag.pagenumber + 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice })
+                @Html.Raw(" ");
+                @Html.ActionLink(">>", "StoreDetails", new { page = ViewBag.pagecount, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice })
+            }
+            else
+            {
+                @:Next >
+                @Html.Raw(" ")
+                @:>>
+            }
+        </div>
+        }
+        <div>
+            @if (ViewBag.userproducts != null)
+            {
+                if (ViewBag.prodcount == 0)
+                {
+                    <h5>Found no User products</h5>
+                }
+                else if (ViewBag.prodcount == 1)
+                {
+                    <h5>Found 1 product</h5>
+
+                }
+                else
+                {
+                    <h5>Found @ViewBag.prodcount products</h5>
+                }
+                foreach (var item in ViewBag.userproducts)
+                {
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.ActionLink("UserProfile", "UserDetails","Users", new { id = item.UserId }, null)
+                        @item.User.FirstName
+                    </dt>
+
+                    <dt>
+                        @item.Name
+                    </dt>
+                    <dt>
+                        @item.Price
+                    </dt>
+                </dl>
+                }
+            }
+        </div>
+       
+    }
+<script type="text/javascript" src="~/Scripts/bootstrapPager.min.js">
+    /* Table initialisation */
+    $(document).ready(function () {
+        $('#example').dataTable({
+            pagingType: "bootstrapPager",
+            pagerSettings: {
+                textboxWidth: 70,
+                firstIcon: "",
+                previousIcon: "glyphicon glyphicon-arrow-left",
+                nextIcon: "glyphicon glyphicon-arrow-right",
+                lastIcon: "",
+                searchOnEnter: true
+            }
+        }
+    });
+</script>
+
+
+@*<div id="travel_selector">
     <form action="#">
         <input id="fromInput" type="text" name="from" value=@Model.Address.ToString()>
         <input id="toInput" type="text" name="to" value="@ViewBag.myAddress" />
@@ -83,7 +218,7 @@
         
 <div id="map-canvas" style="width:600px;height:400px"></div>
 
-<div id="status"></div>
+<div id="status"></div>*@
 
 
 <p>
@@ -106,7 +241,7 @@
     var clckTimeOut;
 
     var fillColor = "#0000FF"; // blue fill
-    var lineColor = "#FF0000"; // black line
+    var lineColor = "#FF0000"; // black line 
     var opacity = 1;
     var lineWeight = 4;
     var options = {
@@ -156,6 +291,7 @@
         geocoder1 = new google.maps.Geocoder();
         geocoder2 = new google.maps.Geocoder();
         directionsDisplay.setMap(map);
+        getDistance();
         //if (address1.length > 0 && address2.length > 0) getDistance();
     }
 

@@ -1,9 +1,10 @@
 namespace StoreOwnerApp.Migrations
 {
-    using System;
-    using System.Data.Entity;
-    using System.Data.Entity.Migrations;
-    using System.Linq;
+    using StoreOwnerApp.Models;
+using System;
+using System.Data.Entity;
+using System.Data.Entity.Migrations;
+using System.Linq;
 
     internal sealed class Configuration : DbMigrationsConfiguration<StoreOwnerApp.Models.ApplicationDbContext>
     {
@@ -11,9 +12,14 @@ namespace StoreOwnerApp.Migrations
         {
             AutomaticMigrationsEnabled = false;
         }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
 
         protected override void Seed(StoreOwnerApp.Models.ApplicationDbContext context)
         {
+             //public DbSet<Product> Products { get; set; }
+            
+
             //  This method will be called after migrating to the latest version.
 
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 

@@ -1,0 +1,13 @@
+﻿@model StoreOwnerApp.Models.Category
+@{
+    ViewBag.Title = "Browse";
+}
+<h2>Browsing Genre: @Model.Name</h2>
+<ul>
+    @foreach (var product in Model.Products)
+    {
+        <li>
+            @Html.ActionLink(product.Name, "ProductDetails", new {id = product.ProductId})
+        </li>
+    }
+</ul>

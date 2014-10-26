@@ -11,9 +11,12 @@ namespace StoreOwnerApp.Models
         [Key]
         public int ProductId { get; set; }
         public int StoreId { get; set; }
+        public int CategoryId { get; set; }
+        public double? original_price { get; set; }
         public string UserId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public decimal Price { get; set; }
 
         public string url { get; set; }
         public string image { get; set; }

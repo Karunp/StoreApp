@@ -14,6 +14,8 @@ using Newtonsoft.Json.Linq;
 using System.Web.Http.Cors;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using StoreOwnerApp.ViewModels;
+using PagedList;
 
 
 namespace StoreOwnerApp.Controllers
@@ -25,11 +27,88 @@ namespace StoreOwnerApp.Controllers
 
         // GET: Stores
         public ActionResult Index()
-        {
-                        
-            return View(db.Stores.ToList());
-        
+        {                        
+            return View(db.Stores.ToList());        
         }
+
+        public ActionResult Browse(string category)
+        {
+            // Retrieve Genre and its Associated Albums from database
+            var catModel = db.Categories.Include("Products")
+                .Single(g => g.Name == category);
+
+            return View(catModel);
+        }
+
+        public ActionResult ProductDetails(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Product product = db.Products.Find(id);
+            if (product== null)
+            {
+                return HttpNotFound();
+            }
+            return View(product);
+        }
+       
+        public ActionResult AddToCart(int id)
+        {
+
+            // Retrieve the album from the database
+            var addedAlbum = db.Products
+                .Single(album => album.ProductId == id);
+
+            // Add it to the shopping cart
+            var cart = ShoppingCart.GetCart(this.HttpContext);
+
+            cart.AddToCart(addedAlbum);
+
+            // Go back to the main store page for more shopping
+            return RedirectToAction("Index");
+        }
+
+        //public ActionResult storeproducts()
+        //{
+        //    //instantiate new client and model
+        //    var client = new HttpClient();
+        //    var model = new List<Product>();
+
+        //    //send get request to specified Uri as an asynchorous operation
+        //    var task = client.GetAsync("http://api.goodzer.com/products/v0.1/search_stores/?query=v-neck+sweater&lat=40.714353&lng=-74.005973&radius=5&priceRange=30:120&apiKey=f7d93213c281896d44c093a36a4f544a")
+        //        .ContinueWith((taskwithmsg) =>
+        //        {
+        //            var response = taskwithmsg.Result;
+        //            //process content
+        //            var jsonTask = response.Content.ReadAsAsync<JObject>();
+        //            jsonTask.Wait();
+        //            var jsonObject = jsonTask.Result;
+        //        //    model = (jsonObject.Children().Skip(1).Cast<JValue>()
+        //        //                       .Select(j => new Product
+        //        //                       {
+        //        //                            title = j["name"].ToString(),
+        //        //                        url = j["url"].ToString(),
+        //        //                        image = j["image"].ToString(),
+        //        //                       })).ToList();
+
+        //        //});
+        //            model.AddRange((from JObject jo in (JArray)jsonObject["stores"]
+                                    
+        //                            select new Product
+        //                            {
+                                        
+        //                                title = jo["name"].ToString(),
+        //                                url = jo["url"].ToString(),
+        //                                image = jo["image"].ToString(),
+        //                            }
+        //                               ));
+
+        //        });
+        //    task.Wait();
+        //    return View(model);
+        //}
 
         public  ActionResult location_details()
         {
@@ -104,6 +183,35 @@ namespace StoreOwnerApp.Controllers
                                            lat = jo["lat"].ToString(),
                                            lng = jo["lng"].ToString()
                                        }
+                                       ));
+
+                });
+            task.Wait();
+            return View(model);
+        }
+
+        public ActionResult search_in_store()
+        {
+            //instantiate new client and model
+            var client = new HttpClient();
+            var model = new List<Product>();
+
+            //send get request to specified Uri as an asynchorous operation
+            var task = client.GetAsync("http://api.goodzer.com/products/v0.1/search_in_store/?storeId=fAfVfDCd&query=ipad+case&priceRange=20:50&apiKey=f7d93213c281896d44c093a36a4f544a")
+                .ContinueWith((taskwithmsg) =>
+                {
+                    var response = taskwithmsg.Result;
+                    //process content
+                    var jsonTask = response.Content.ReadAsAsync<JObject>();
+                    jsonTask.Wait();
+                    var jsonObject = jsonTask.Result;
+                    model.AddRange((from JObject jo in (JArray)jsonObject["products"]
+                                    select new Product
+                                    {
+                                        id = jo["id"].ToString(),
+                                        title = jo["title"].ToString(),
+                                        
+                                    }
                                        ));
 
                 });
@@ -190,7 +298,7 @@ namespace StoreOwnerApp.Controllers
         }
 
         // GET: Stores/Details/5
-        public ActionResult StoreDetails(int? id)
+        public ActionResult StoreDetails(int? id, string productname, string myStore, decimal? fromprice,decimal? toprice, int? page)
         {
             ViewBag.myAddress = db.Users.Find(User.Identity.GetUserId()).Address;            
             if (id == null)
@@ -204,11 +312,72 @@ namespace StoreOwnerApp.Controllers
             {
                 return HttpNotFound();
             }
+            //instantiate new client and model
+            var client = new HttpClient();
+            var model = new List<Product>();
+
+            if (!String.IsNullOrEmpty(productname))
+            {
+                if (store.Name == "Wal Mart")
+                {
+                    myStore = "KfALmUgd";
+                }
+                else if (store.Name == "Best Buy")
+                {
+                    myStore = "fAfVfDCd";
+                }
+                ViewBag.userproducts = db.Products.Where(a=> a.Name.Contains(productname) && a.Price >= fromprice && a.Price <= toprice);
+                ViewBag.prodcount = db.Products.Where(b => b.Name.Contains(productname)).Count();
+                var task = client.GetAsync("http://api.goodzer.com/products/v0.1/search_in_store/?storeId=" + myStore +"&query=" + productname + "&priceRange=" +fromprice+":"+toprice+"&apiKey=f7d93213c281896d44c093a36a4f544a")
+               .ContinueWith((taskwithmsg) =>
+               {
+                   var response = taskwithmsg.Result;
+                   //process content
+                   var jsonTask = response.Content.ReadAsAsync<JObject>();
+                   jsonTask.Wait();
+                   var jsonObject = jsonTask.Result;
+                   model.AddRange((from JObject jo in (JArray)jsonObject["products"]
+                                   select new Product
+                                   {
+                                       id = jo["id"].ToString(),
+                                       title = jo["title"].ToString(),
+                                       url = jo["url"].ToString(),
+                                       image = jo["image"].ToString(),
+                                       Price = Convert.ToDecimal(jo["price"])
+                                   }
+                                      ));
+
+               });
+                if (Request.HttpMethod != "GET")
+                {
+                    page = 1;
+                }
+                int pageSize = 2;
+                int pageNumber = (page ?? 1);
+                ViewBag.pageSize = pageSize;
+                ViewBag.pageNumber = pageNumber;
+                task.Wait();
+                ViewBag.myModel = model.OrderBy(a=> a.Name).ToPagedList(pageNumber, pageSize);
+                ViewBag.pagecount = model.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize).PageCount;
+                ViewBag.prevpage = model.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize).HasPreviousPage;
+                ViewBag.nextpage = model.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize).HasNextPage;
+                ViewBag.modelcount = model.Count();
+                ViewBag.productname = productname;
+                ViewBag.fromprice = fromprice;
+                ViewBag.toprice = toprice;
+
+            }
+            //send get request to specified Uri as an asynchorous operation
+           
             return View(store);
         }
 
+      
+       
         public ActionResult AddProduct()
         {
+            ViewBag.CategoryId = new SelectList(db.Categories, "CategoryId", "Name");
+
             return View();
         }
 
@@ -225,6 +394,8 @@ namespace StoreOwnerApp.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
+            ViewBag.CategoryId = new SelectList(db.Categories, "CategoryId", "Name", product.CategoryId);
+
             //ViewBag.CategoryId = new SelectList(db.Categories, "CategoryId", "Name", product.CategoryId);
 
             return View(product);

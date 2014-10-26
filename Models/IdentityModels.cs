@@ -48,6 +48,14 @@ namespace StoreOwnerApp.Models
 
         public System.Data.Entity.DbSet<StoreOwnerApp.Models.Location> Locations { get; set; }
 
+        public System.Data.Entity.DbSet<StoreOwnerApp.Models.Cart> Carts { get; set; }
+
+        public System.Data.Entity.DbSet<StoreOwnerApp.Models.OrderDetail> OrderDetails { get; set; }
+
+        public System.Data.Entity.DbSet<StoreOwnerApp.Models.Order> Orders { get; set; }
+
+        public System.Data.Entity.DbSet<StoreOwnerApp.Models.Category> Categories { get; set; }
+
         //public System.Data.Entity.DbSet<StoreOwnerApp.Models.User> ApplicationUsers { get; set; }
     }
 }
