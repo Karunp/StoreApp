@@ -86,3 +86,5 @@ C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\ob
 C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\obj\Debug\StoreOwnerApp.Migrations.changedproductmode.resources
 C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\bin\PagedList.dll
 C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\bin\PagedList.xml
+C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\obj\Debug\StoreOwnerApp.Migrations.newstorecolumn.resources
+C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\bin\GoogleMaps.LocationServices.dll

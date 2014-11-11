@@ -16,6 +16,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using StoreOwnerApp.ViewModels;
 using PagedList;
+using GoogleMaps.LocationServices;
 
 
 namespace StoreOwnerApp.Controllers
@@ -70,45 +71,93 @@ namespace StoreOwnerApp.Controllers
             return RedirectToAction("Index");
         }
 
-        //public ActionResult storeproducts()
-        //{
-        //    //instantiate new client and model
-        //    var client = new HttpClient();
-        //    var model = new List<Product>();
+        public ActionResult FindStores()
+        {
+            //instantiate new client and model
+            var client = new HttpClient();
+            var model = new List<Location>();
 
-        //    //send get request to specified Uri as an asynchorous operation
-        //    var task = client.GetAsync("http://api.goodzer.com/products/v0.1/search_stores/?query=v-neck+sweater&lat=40.714353&lng=-74.005973&radius=5&priceRange=30:120&apiKey=f7d93213c281896d44c093a36a4f544a")
-        //        .ContinueWith((taskwithmsg) =>
-        //        {
-        //            var response = taskwithmsg.Result;
-        //            //process content
-        //            var jsonTask = response.Content.ReadAsAsync<JObject>();
-        //            jsonTask.Wait();
-        //            var jsonObject = jsonTask.Result;
-        //        //    model = (jsonObject.Children().Skip(1).Cast<JValue>()
-        //        //                       .Select(j => new Product
-        //        //                       {
-        //        //                            title = j["name"].ToString(),
-        //        //                        url = j["url"].ToString(),
-        //        //                        image = j["image"].ToString(),
-        //        //                       })).ToList();
+            //Multiple locations
+            //send get request to specified Uri as an asynchorous operation
+            var task = client.GetAsync("http://api.goodzer.com/products/v0.1/location_details/?locationId=fKAKgREd&apiKey=f7d93213c281896d44c093a36a4f544a")
+                .ContinueWith((taskwithmsg) =>
+                {
+                    var response = taskwithmsg.Result;
+                    //process content
+                    var jsonTask = response.Content.ReadAsAsync<JObject>();
+                    jsonTask.Wait();
+                    var jsonObject = jsonTask.Result;
 
-        //        //});
-        //            model.AddRange((from JObject jo in (JArray)jsonObject["stores"]
-                                    
-        //                            select new Product
-        //                            {
-                                        
-        //                                title = jo["name"].ToString(),
-        //                                url = jo["url"].ToString(),
-        //                                image = jo["image"].ToString(),
-        //                            }
-        //                               ));
+                    //Skip first index to access JProperties of "location" index - bind to model
+                    model = (jsonObject.Children().Skip(1).Cast<JProperty>()
+                                        .Select(j => new Location
+                                        {
+                                            city = j.Value["city"].ToString(),
+                                            address = j.Value["address"].ToString(),
+                                            name = j.Value["name"].ToString(),
+                                            lat = j.Value["lat"].ToString(),
+                                            lng = j.Value["lng"].ToString()
+                                        })).ToList();
 
-        //        });
-        //    task.Wait();
-        //    return View(model);
-        //}
+                });
+            task.Wait();
+            return View(model);
+        }
+
+        public ActionResult storeproducts()
+        {
+            //instantiate new client and model
+            var client = new HttpClient();
+            var model = new List<Store>();
+            var prodmodel = new List<Product>();
+            var address = db.Users.Find(User.Identity.GetUserId()).Address;
+            var locationService = new GoogleLocationService();
+            var point = locationService.GetLatLongFromAddress(address);
+            var latitude = point.Latitude;
+            var longitude = point.Longitude;
+
+            //send get request to specified Uri as an asynchorous operation
+            var task = client.GetAsync("http://api.goodzer.com/products/v0.1/search_stores/?query=halo&lat=" +latitude+ "&lng=" +longitude +"&radius=20&priceRange=30:120&apiKey=f7d93213c281896d44c093a36a4f544a")
+                .ContinueWith((taskwithmsg) =>
+                {
+                    var response = taskwithmsg.Result;
+                    //process content
+                    var jsonTask = response.Content.ReadAsAsync<JObject>();
+                    jsonTask.Wait();
+                    var jsonObject = jsonTask.Result;
+
+                    model.AddRange((from JObject jo in (JArray)jsonObject["stores"]
+                                    select new Store
+                                    {
+                                        Name = jo["name"].ToString(),
+                                        //Products = jo["stores"][0]["products"].Values().ToList(),                                        
+                                        //url = jo["url"].ToString(),
+                                        //image = jo["image"].ToString(),
+                                    }
+                                       ));
+                    int i = 0;
+                    while (i < 6)
+                    {
+                       
+                    prodmodel.AddRange((from JObject jo in (JArray)jsonObject["stores"][i]["products"]
+                                        select new Product
+                                        {
+                                            title = jo["title"].ToString(),
+                                            url = jo["url"].ToString(),
+                                            image = jo["image"].ToString(),
+                                        }
+                                      ));
+                    i++;
+                    }
+
+
+
+                });              
+            task.Wait();
+            ViewBag.store = model;
+            ViewBag.prod = prodmodel;
+            return View(model);
+        }
 
         public  ActionResult location_details()
         {
@@ -161,63 +210,178 @@ namespace StoreOwnerApp.Controllers
 
 
         //[JsonTest]
-        public ActionResult search_stores()
+        public ActionResult search_stores(string productname, decimal? fromprice, decimal? toprice)
         {
             //instantiate new client and model
             var client = new HttpClient();            
             var model = new List<Location>();
 
-            //send get request to specified Uri as an asynchorous operation
-            var task = client.GetAsync("http://api.goodzer.com/products/v0.1/search_locations/?query=v-neck+sweater&lat=40.714353&lng=-74.005973 &radius=1.0&priceRange=30:120&apiKey=f7d93213c281896d44c093a36a4f544a")
-                .ContinueWith((taskwithmsg) =>
-                {
-                    var response = taskwithmsg.Result;
-                    //process content
-                    var jsonTask = response.Content.ReadAsAsync <JObject>();
-                    jsonTask.Wait();
-                    var jsonObject = jsonTask.Result;
-                    model.AddRange((from JObject jo in (JArray)jsonObject["locations"]
-                                       select new Location{
-                                           name= jo["name"].ToString(),
-                                           store_id = jo["store_id"].ToString(), 
-                                           lat = jo["lat"].ToString(),
-                                           lng = jo["lng"].ToString()
-                                       }
-                                       ));
+            var address = db.Users.Find(User.Identity.GetUserId()).Address;
+            var locationService = new GoogleLocationService();
+            var point1 = locationService.GetLatLongFromAddress(address);
+            var latitude = point1.Latitude;
+            var longitude = point1.Longitude;
 
-                });
-            task.Wait();
+          
+            if (!String.IsNullOrEmpty(productname))
+            {
+                //send get request to specified Uri as an asynchorous operation
+                var task = client.GetAsync("http://api.goodzer.com/products/v0.1/search_locations/?query=" + productname + "&lat=" + latitude + "&lng=" + longitude + "&radius=20&priceRange= " + fromprice + ":" + toprice + "&apiKey=f7d93213c281896d44c093a36a4f544a")
+                    .ContinueWith((taskwithmsg) =>
+                    {
+                        var response = taskwithmsg.Result;
+                        //process content
+                        var jsonTask = response.Content.ReadAsAsync<JObject>();
+                        jsonTask.Wait();
+                        var jsonObject = jsonTask.Result;
+                        model.AddRange((from JObject jo in (JArray)jsonObject["locations"]
+                                        select new Location
+                                        {
+                                            name = jo["name"].ToString(),
+                                            store_id = jo["store_id"].ToString(),
+                                            lat = jo["lat"].ToString(),
+                                            lng = jo["lng"].ToString()
+                                        }
+                                           ));
+
+                    });
+                task.Wait();
+            }
+            ViewBag.model = model;
+            ViewBag.productname = productname;
+            ViewBag.fromprice = fromprice;
+            ViewBag.toprice = toprice;
+
+            ViewBag.mylat = latitude;
+            ViewBag.mylng = longitude;
+
             return View(model);
         }
 
-        public ActionResult search_in_store()
+        public ActionResult search_in_store(string storeID, string productname,  decimal? fromprice, decimal? toprice, int? page, string lat, string lng)
+        {                      
+            //instantiate new client and model
+            var client = new HttpClient();
+            var model = new List<Product>();
+            var address = db.Users.Find(User.Identity.GetUserId()).Address;
+            var locationService = new GoogleLocationService();
+            var point = locationService.GetLatLongFromAddress(address);
+            ViewBag.mylat = point.Latitude;
+            ViewBag.mylng = point.Longitude;
+
+            if (!String.IsNullOrEmpty(productname))
+            {
+                ViewBag.userproducts = db.Products.Where(a => a.Name.Contains(productname) && a.Price >= fromprice && a.Price <= toprice);
+                ViewBag.prodcount = db.Products.Where(b => b.Name.Contains(productname)).Count();
+                var task = client.GetAsync("http://api.goodzer.com/products/v0.1/search_in_store/?storeId=" + storeID + "&query=" + productname + "&priceRange=" + fromprice + ":" + toprice + "&apiKey=f7d93213c281896d44c093a36a4f544a")
+               .ContinueWith((taskwithmsg) =>
+               {
+                   var response = taskwithmsg.Result;
+                   //process content
+                   var jsonTask = response.Content.ReadAsAsync<JObject>();
+                   jsonTask.Wait();
+                   var jsonObject = jsonTask.Result;
+                   model.AddRange((from JObject jo in (JArray)jsonObject["products"]
+                                   select new Product
+                                   {
+                                       id = jo["id"].ToString(),
+                                       title = jo["title"].ToString(),
+                                       url = jo["url"].ToString(),
+                                       image = jo["image"].ToString(),
+                                       Price = Convert.ToDecimal(jo["price"])
+                                   }
+                                      ));
+
+               });
+                if (Request.HttpMethod != "GET")
+                {
+                    page = 1;
+                }
+                int pageSize = 2;
+                int pageNumber = (page ?? 1);
+                ViewBag.pageSize = pageSize;
+                ViewBag.pageNumber = pageNumber;
+                task.Wait();
+                ViewBag.myModel = model.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize);
+                ViewBag.pagecount = model.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize).PageCount;
+                ViewBag.prevpage = model.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize).HasPreviousPage;
+                ViewBag.nextpage = model.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize).HasNextPage;
+                ViewBag.modelcount = model.Count();
+                ViewBag.storelat = lat;
+                ViewBag.storelng = lng;
+                ViewBag.productname = productname;
+                ViewBag.storeID = storeID;
+                ViewBag.fromprice = fromprice;
+                ViewBag.toprice = toprice;
+
+            }
+            //send get request to specified Uri as an asynchorous operation
+
+            return View(model);
+        }
+
+        public PartialViewResult ajax_store_products(string storeID, string productname, decimal? fromprice, decimal? toprice, int? page, string lat, string lng)
         {
             //instantiate new client and model
             var client = new HttpClient();
             var model = new List<Product>();
+            var address = db.Users.Find(User.Identity.GetUserId()).Address;
+            var locationService = new GoogleLocationService();
+            var point = locationService.GetLatLongFromAddress(address);
+            ViewBag.mylat = point.Latitude;
+            ViewBag.mylng = point.Longitude;
 
-            //send get request to specified Uri as an asynchorous operation
-            var task = client.GetAsync("http://api.goodzer.com/products/v0.1/search_in_store/?storeId=fAfVfDCd&query=ipad+case&priceRange=20:50&apiKey=f7d93213c281896d44c093a36a4f544a")
-                .ContinueWith((taskwithmsg) =>
+            if (!String.IsNullOrEmpty(productname))
+            {
+                ViewBag.userproducts = db.Products.Where(a => a.Name.Contains(productname) && a.Price >= fromprice && a.Price <= toprice);
+                ViewBag.prodcount = db.Products.Where(b => b.Name.Contains(productname)).Count();
+                var task = client.GetAsync("http://api.goodzer.com/products/v0.1/search_in_store/?storeId=" + storeID + "&query=" + productname + "&priceRange=" + fromprice + ":" + toprice + "&apiKey=f7d93213c281896d44c093a36a4f544a")
+               .ContinueWith((taskwithmsg) =>
+               {
+                   var response = taskwithmsg.Result;
+                   //process content
+                   var jsonTask = response.Content.ReadAsAsync<JObject>();
+                   jsonTask.Wait();
+                   var jsonObject = jsonTask.Result;
+                   model.AddRange((from JObject jo in (JArray)jsonObject["products"]
+                                   select new Product
+                                   {
+                                       id = jo["id"].ToString(),
+                                       title = jo["title"].ToString(),
+                                       url = jo["url"].ToString(),
+                                       image = jo["image"].ToString(),
+                                       Price = Convert.ToDecimal(jo["price"])
+                                   }
+                                      ));
+
+               });
+                if (Request.HttpMethod != "GET")
                 {
-                    var response = taskwithmsg.Result;
-                    //process content
-                    var jsonTask = response.Content.ReadAsAsync<JObject>();
-                    jsonTask.Wait();
-                    var jsonObject = jsonTask.Result;
-                    model.AddRange((from JObject jo in (JArray)jsonObject["products"]
-                                    select new Product
-                                    {
-                                        id = jo["id"].ToString(),
-                                        title = jo["title"].ToString(),
-                                        
-                                    }
-                                       ));
+                    page = 1;
+                }
+                int pageSize = 2;
+                int pageNumber = (page ?? 1);
+                ViewBag.pageSize = pageSize;
+                ViewBag.pageNumber = pageNumber;
+                task.Wait();
+                ViewBag.myModel = model.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize);
+                ViewBag.pagecount = model.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize).PageCount;
+                ViewBag.prevpage = model.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize).HasPreviousPage;
+                ViewBag.nextpage = model.OrderBy(a => a.Name).ToPagedList(pageNumber, pageSize).HasNextPage;
+                ViewBag.modelcount = model.Count();
+                ViewBag.storelat = lat;
+                ViewBag.storelng = lng;
+                ViewBag.productname = productname;
+                ViewBag.storeID = storeID;
+                ViewBag.fromprice = fromprice;
+                ViewBag.toprice = toprice;
 
-                });
-            task.Wait();
-            return View(model);
+            }
+            //send get request to specified Uri as an asynchorous operation
+
+            return PartialView(model);
         }
+
 
         [HttpPost]
         public JsonResult search_stores_post()
@@ -484,7 +648,10 @@ namespace StoreOwnerApp.Controllers
             db.SaveChanges();
             return RedirectToAction("Index");
         }
-
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        //::  This function converts decimal degrees to radians             :::
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+       
         protected override void Dispose(bool disposing)
         {
             if (disposing)

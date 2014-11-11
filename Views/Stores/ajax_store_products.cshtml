@@ -1,0 +1,66 @@
+﻿
+
+<table id="example" class="table table-striped">
+
+    <tr>
+        <th>
+            Image
+        </th>
+        <th>
+
+            Title
+        </th>
+        <th>
+            Price
+        </th>
+
+    </tr>
+
+
+    @foreach (dynamic item in ViewBag.myModel)
+    {
+
+        <tr>
+
+            <td>
+                <a href="@item.url">
+                    <img src="@item.image" />
+                </a>
+            </td>
+            <td>
+                @item.title
+
+            </td>
+            <td>
+                @item.Price
+            </td>
+        </tr>
+
+    }
+</table>
+        @if (ViewBag.prevpage)
+        {
+            @Ajax.ActionLink("<<", "ajax_store_products", new { storeID = ViewBag.storeID, page = 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng }, new AjaxOptions() { UpdateTargetId = "mydiv", InsertionMode = InsertionMode.Replace, HttpMethod = "GET" })
+            @Html.Raw(" ");
+            @Ajax.ActionLink("< Prev", "ajax_store_products", new { storeID = ViewBag.storeID, page = ViewBag.pagenumber - 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng }, new AjaxOptions() { UpdateTargetId = "mydiv", InsertionMode = InsertionMode.Replace, HttpMethod = "GET" })
+        }
+        else
+        {
+            @:<<
+            @Html.Raw(" ");
+            @:< Prev
+        }
+        @if (ViewBag.nextpage)
+        {
+            @Ajax.ActionLink("Next >", "ajax_store_products", "Stores", new { storeID = ViewBag.storeID, page = ViewBag.pagenumber + 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng }, new AjaxOptions() { UpdateTargetId = "mydiv", InsertionMode = InsertionMode.Replace, HttpMethod = "GET" })
+            @Html.Raw(" ");
+            @Ajax.ActionLink(">>", "ajax_store_products", new { storeID = ViewBag.storeID, page = ViewBag.pagecount, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng }, new AjaxOptions() { UpdateTargetId = "mydiv", InsertionMode = InsertionMode.Replace, HttpMethod = "GET" })
+        }
+        else
+        {
+            @:Next >
+            @Html.Raw(" ")
+            @:>>
+        }
+<h5>Page (@ViewBag.pageNumber of @ViewBag.pagecount)</h5>
+   

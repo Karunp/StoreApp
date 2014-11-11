@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,8 +13,12 @@ namespace StoreOwnerApp.Models
         public int StoreId { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
+        public string Prodname { get; set; }
+        public string[] prodarray { get; set; }
 
-        public virtual User User { get; set; }       
-        public virtual List<Product> Products { get; set; }    
+        public virtual User User { get; set; }
+        public virtual IEnumerable<Newtonsoft.Json.Linq.JToken> Products { get; set; }
+
+       
     }
 }

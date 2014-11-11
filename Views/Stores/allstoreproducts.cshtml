@@ -1,0 +1,116 @@
+﻿@model IEnumerable<StoreOwnerApp.Models.Product>
+@{
+    ViewBag.Title = "allstoreproducts";
+}
+
+<h2>allstoreproducts</h2>
+
+    if (ViewBag.myModel != null)
+    {
+        <h5>Found @ViewBag.modelcount Products Online</h5>
+
+
+        <table id="example" class="table table-striped">
+
+            <tr>
+                <th>
+                    Image
+                </th>
+                <th>
+
+                    Title
+                </th>
+                <th>
+                    Price
+                </th>
+
+            </tr>
+
+
+            @foreach (dynamic item in ViewBag.myModel)
+            {
+
+                <tr>
+
+                    <td>
+                        <img src="@item.image">
+
+                    </td>
+                    <td>
+                        @item.title
+
+                    </td>
+                    <td>
+                        @item.Price
+                    </td>
+                    <td>
+                        @item.url
+                    </td>
+
+                </tr>
+
+            }
+        </table>
+
+        <div>
+            @if (ViewBag.prevpage)
+            {
+                @Html.ActionLink("<<", "search_in_store", new { storeID = ViewBag.storeID, page = 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng })
+                @Html.Raw(" ");
+                @Html.ActionLink("< Prev", "search_in_store", new { storeID = ViewBag.storeID, page = ViewBag.pagenumber - 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng })
+            }
+            else
+            {
+                @:<<
+                @Html.Raw(" ");
+                @:< Prev
+            }
+
+            @if (ViewBag.nextpage)
+            {
+                @Ajax.ActionLink("Next >", "search_in_store", "Stores", new { storeID = ViewBag.storeID, page = ViewBag.pagenumber + 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng }, new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "mydiv", InsertionMode = InsertionMode.Replace, })
+                @Html.Raw(" ");
+                @Html.ActionLink(">>", "search_in_store", new { storeID = ViewBag.storeID, page = ViewBag.pagecount, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng })
+            }
+            else
+            {
+                @:Next >
+                @Html.Raw(" ")
+                @:>>
+            }
+        </div>
+    }
+    <div>
+        @if (ViewBag.userproducts != null)
+        {
+            if (ViewBag.prodcount == 0)
+            {
+                <h5>Found no User products</h5>
+            }
+            else if (ViewBag.prodcount == 1)
+            {
+                <h5>Found 1 product</h5>
+
+            }
+            else
+            {
+                <h5>Found @ViewBag.prodcount products</h5>
+            }
+            foreach (var item in ViewBag.userproducts)
+            {
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.ActionLink("UserProfile", "UserDetails", "Users", new { id = item.UserId }, null)
+                        @*@item.User.FirstName*@
+                    </dt>
+
+                    <dt>
+                        @item.Name
+                    </dt>
+                    <dt>
+                        @item.Price
+                    </dt>
+                </dl>
+            }
+        }
+    </div>

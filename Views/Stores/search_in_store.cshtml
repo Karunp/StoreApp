@@ -3,18 +3,219 @@
     ViewBag.Title = "search_in_store";
 }
 
-<h2>search_in_store</h2>
+@*<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyArIHSLWrq4TrnoUmkplpbIillbYCc1GZg"></script>*@
 
-
-@foreach (dynamic item in Model)
-{
-    <li>
-        <h5>
-            @item.id
-        </h5>
-        <h5>
-            @item.title
-        </h5>
-
-    </li>
+@{
+    ViewBag.Title = "search in store";
 }
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+
+<br />
+<h3>Looking For something else?</h3>
+<div id="dialog_window_id"></div>
+
+@using (Html.BeginForm("Search_in_store", "Stores"))
+{
+
+    <p>
+        @*<input  type="text" value= @Html.Value("storeID") />*@
+        @*<input  type="search" value=@ViewBag.storelat />
+        <input  type="search" value=@ViewBag.storelng />
+        <input type="text" value=@ViewBag.pageNumber />*@
+
+       
+        @Html.Hidden("storeID")
+        @Html.Hidden("lat")
+        @Html.Hidden("lng")
+      
+        Title: @Html.TextBox("productname")
+        FromPrice: @Html.TextBox("fromPrice")
+        ToPrice: @Html.TextBox("toPrice")
+        <input type="submit" value="Filter" />
+    </p>
+}
+<div id="mydiv">
+
+    @if (ViewBag.myModel != null)
+    {
+        <h5>Found @ViewBag.modelcount Products Online</h5>
+
+
+
+        <table id="example" class="table table-striped">
+
+            <tr>
+                <th>
+                    Image
+                </th>
+                <th>
+
+                    Title
+                </th>
+                <th>
+                    Price
+                </th>
+
+            </tr>
+
+
+            @foreach (dynamic item in ViewBag.myModel)
+            {
+
+                <tr>
+
+                    <td>
+                        <a href="@item.url">
+                            <img src="@item.image" />
+                        </a>
+                    </td>
+                    <td>
+                        @item.title
+
+                    </td>
+                    <td>
+                        @item.Price
+                    </td>
+                </tr>
+
+            }
+        </table>
+
+
+
+        if (ViewBag.prevpage)
+        {
+            @Ajax.ActionLink("<<", "ajax_store_products", new { storeID = ViewBag.storeID, page = 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng }, new AjaxOptions() { UpdateTargetId = "mydiv", InsertionMode = InsertionMode.Replace, HttpMethod = "GET" })
+            @Html.Raw(" ");
+            @Ajax.ActionLink("< Prev", "ajax_store_products", new { storeID = ViewBag.storeID, page = ViewBag.pagenumber - 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng }, new AjaxOptions() { UpdateTargetId = "mydiv", InsertionMode = InsertionMode.Replace, HttpMethod = "GET" })
+        }
+        else
+        {
+            @:<<
+            @Html.Raw(" ");
+            @:< Prev
+            }
+
+        if (ViewBag.nextpage)
+        {
+            @Ajax.ActionLink("Next >", "ajax_store_products", "Stores", new { storeID = ViewBag.storeID, page = ViewBag.pagenumber + 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng }, new AjaxOptions() { UpdateTargetId = "mydiv", InsertionMode = InsertionMode.Replace, HttpMethod = "GET" })
+            @Html.Raw(" ");
+            @Ajax.ActionLink(">>", "ajax_store_products", new { storeID = ViewBag.storeID, page = ViewBag.pagecount, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng }, new AjaxOptions() { UpdateTargetId = "mydiv", InsertionMode = InsertionMode.Replace, HttpMethod = "GET" })
+        }
+        else
+        {
+            @:Next >
+            @Html.Raw(" ")
+            @:>>
+            }
+    }
+    <h5>Page (@ViewBag.pageNumber of @ViewBag.pagecount)</h5>
+
+</div>
+   
+    
+
+    @*<div>
+        @if (ViewBag.userproducts != null)
+        {
+            if (ViewBag.prodcount == 0)
+            {
+                <h5>Found no User products</h5>
+            }
+            else if (ViewBag.prodcount == 1)
+            {
+                <h5>Found 1 product</h5>
+
+            }
+            else
+            {
+                <h5>Found @ViewBag.prodcount products</h5>
+            }
+            foreach (var item in ViewBag.userproducts)
+            {
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.ActionLink("UserProfile", "UserDetails", "Users", new { id = item.UserId }, null)
+                        @item.User.FirstName
+                    </dt>
+
+                    <dt>
+                        @item.Name
+                    </dt>
+                    <dt>
+                        @item.Price
+                    </dt>
+                </dl>
+            }
+        }
+    </div>*@
+
+
+<div id="control">
+    <strong>Start:</strong>
+    <select id="storelat" onloadeddata="calcRoute();">
+        <option value=@ViewBag.storelat>Storelat</option>
+    </select>
+    <select id="storelng" onloadeddata="calcRoute();">
+        <option value=@ViewBag.storelng>storelng</option>
+    </select>  
+    <strong>End:</strong>
+    <select id="mylat" onloadeddata="calcRoute();">
+        <option value=@ViewBag.mylat>mylat</option>
+    </select>
+    <select id="mylng" onloadeddata="calcRoute();">
+        <option value=@ViewBag.mylng>mylng</option>
+    </select>
+</div>
+
+
+<div id="directions-panel"></div>
+<div id="map-canvas" style="width:600px;height:400px"></div>
+
+@*<div id="mydiv"></div>*@
+
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+<script>
+    var directionsDisplay;
+    var directionsService = new google.maps.DirectionsService();
+
+    function initialize() {
+        directionsDisplay = new google.maps.DirectionsRenderer();
+        var mapOptions = {
+            zoom: 7,
+            center: new google.maps.LatLng(41.850033, -87.6500523)
+        };
+        var map = new google.maps.Map(document.getElementById('map-canvas'),
+            mapOptions);
+        directionsDisplay.setMap(map);
+        directionsDisplay.setPanel(document.getElementById('directions-panel'));
+
+        var control = document.getElementById('control');
+        control.style.display = 'block';
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(control);
+    }
+
+    function calcRoute() {
+        var storelat = document.getElementById('storelat').value;
+        var storelng = document.getElementById('storelng').value;
+
+        var mylat = document.getElementById('mylat').value;
+        var mylng = document.getElementById('mylng').value;
+        var request = {
+            origin: new google.maps.LatLng(mylat, mylng),
+            destination: new google.maps.LatLng(storelat, storelng),
+            travelMode: google.maps.TravelMode.DRIVING
+        };
+        directionsService.route(request, function (response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+                directionsDisplay.setDirections(response);
+            }
+        });
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize);
+    google.maps.event.addDomListener(window, 'load', calcRoute);
+</script>

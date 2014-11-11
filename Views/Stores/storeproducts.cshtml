@@ -5,3 +5,22 @@
 
 <h2>storeproducts</h2>
 
+@foreach (dynamic item in ViewBag.store)
+{
+    
+        <h1>
+            @item.Name
+        </h1>      
+    foreach (dynamic anitem in ViewBag.prod)
+    {
+        <h1>
+            @anitem.title
+        </h1>
+        <h1>
+            @anitem.url
+        </h1>
+    }
+
+}
+  
+

@@ -5,70 +5,91 @@
 
 <h2>search_stores</h2>
 
-@foreach (dynamic item in Model)
-{
-    <li>
-        <h5>
-            @item.name
-        </h5>
-        <h5>
-            @item.store_id
-        </h5>
-        <h5>
-            @item.lat
-        </h5>
-    </li>
+@functions {
+    private static Double rad2deg(Double rad)
+    {
+        return (rad / Math.PI * 180.0);
+    }
+
+    private static Double deg2rad(Double deg)
+    {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private const Double kEarthRadiusKms = 6376.5;
+
+    private static Double CalculateDistance(Double latitude1, Double longitude1, Double latitude2, Double longitude2)
+    {
+        double theta = longitude1 - longitude2;
+        double dist = Math.Sin(deg2rad(latitude1)) * Math.Sin(deg2rad(latitude2)) + Math.Cos(deg2rad(latitude1)) * Math.Cos(deg2rad(latitude2)) * Math.Cos(deg2rad(theta));
+        dist = Math.Acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        dist = dist * 1.609344;
+        return (dist);
+    }
 }
-<script src="//code.jquery.com/jquery-1.10.2.js"></script>
-<script type="text/javascript"src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
-<div id="map-canvas" style="width:600px;height:400px"></div>
 
-<script>
-    $(document).ready(function () {
-        //declare a variable
-        var myMarkers = [];
 
-        $.ajax({
-            async: true,
-            type: "POST",
-            dataType: "json",
-            url: '@Url.Action("search_stores_post", "Stores")',
-            data:'{}',
-            success:function(result){
-                //get address from controller action.....
-                myMarkers = result.jResult;
+
+@using (Html.BeginForm("Search_stores", "Stores", FormMethod.Get))
+{
+
+    <p>
+       
+        Title: @Html.TextBox("productname")
+        FromPrice: @Html.TextBox("fromPrice")
+        ToPrice: @Html.TextBox("toPrice")
+        <input type="submit" value="Filter" />
+    </p>
+
+    if (ViewBag.model != null)
+    {
+
+        <table id="example" class="table table-striped">
+
+            <tr>
+              
+                <th>
+                    Name
+                </th>
+              
+                <th>Distance(miles)</th>
+
+            </tr>
+
+
+            @foreach (dynamic item in ViewBag.model)
+            {
+
+                <tr>                   
+                    <td>
+                        @item.name
+                    </td>
+                    <td>@ViewBag.distance</td>
+                    <td>@CalculateDistance(Convert.ToDouble(ViewBag.mylat),Convert.ToDouble(ViewBag.mylng), Convert.ToDouble(item.lat), Convert.ToDouble(item.lng))</td>
+                   
+                    <td>
+                        @Html.ActionLink("ViewStore", "search_in_store", new { storeID = item.store_id, productname = ViewBag.productname, fromprice = ViewBag.fromprice, toprice = ViewBag.toprice, lat = item.lat, lng = item.lng })
+                        @*@item.store_id*@
+                    </td>      
+
+                </tr>
+
             }
+        </table>
 
-        });
-        //init google map
-        function googleMap() {
-            var mapOptions = {
-                center: new google.maps.LatLng(myMarkers["lat"], myMarkers["lng"]),
-                zoom: 2,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            var infoWindow = new google.maps.InfoWindow();
-            var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-            for (i = 0; i < myMarkers.length; i++) {
-                data = myMarkers[i];
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(data.lat, data.lng),
-                    map: map
-                });
-                (function (marker, data) {
-                    google.maps.event.addListener(marker, "click", function (e) {
-                        infoWindow.setContent(data.Description);
-                        infoWindow.open(map, marker);
-                    });
-                })(marker, data);
-            }
-        }
-        google.maps.event.addDomListener(window, 'load', googleMap);
+       
 
-    })
-          
+}
+}
 
-</script>
+
+
+
+
+
+
 
 
 
