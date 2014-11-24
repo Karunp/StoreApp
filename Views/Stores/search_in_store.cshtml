@@ -87,7 +87,7 @@
 
         if (ViewBag.prevpage)
         {
-            @Ajax.ActionLink("<<", "ajax_store_products", new { storeID = ViewBag.storeID, page = 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng }, new AjaxOptions() { UpdateTargetId = "mydiv", InsertionMode = InsertionMode.Replace, HttpMethod = "GET" })
+            @Ajax.ActionLink("<<", "ajax_store_products", new { storeID = ViewBag.myid, page = 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng }, new AjaxOptions() { UpdateTargetId = "mydiv", InsertionMode = InsertionMode.Replace, HttpMethod = "GET" })
             @Html.Raw(" ");
             @Ajax.ActionLink("< Prev", "ajax_store_products", new { storeID = ViewBag.storeID, page = ViewBag.pagenumber - 1, productname = ViewBag.productname, FromPrice = ViewBag.fromprice, ToPrice = ViewBag.toprice, lat = ViewBag.storelat, lng = ViewBag.storelng }, new AjaxOptions() { UpdateTargetId = "mydiv", InsertionMode = InsertionMode.Replace, HttpMethod = "GET" })
         }
@@ -115,42 +115,74 @@
 
 </div>
    
-    
+<form id="form1" runat="server">
+   
+        <p>
+            <a><asp:LinkButton ID="lnkbtn" runat="server"><b>Hide</b></asp:LinkButton> </a>
+        </p>
+        <p>
+            
+                <div id="divreg">
+                            <h5>
+                                @ViewBag.mystore.name
+                            </h5>
+                            <h5>
+                                @ViewBag.mystore.address                                
+                            </h5>
+                            <h5>
+                                @ViewBag.mystore.city
+                            </h5>
+                            <h5>
+                                @ViewBag.mystore.state
+                            </h5>
+                           
+                            <h5>
+                                @ViewBag.mystore.phone
+                            </h5>
+                       
+                 
+                </div>
+            
+        </p>
+   
+</form>
 
-    @*<div>
-        @if (ViewBag.userproducts != null)
-        {
-            if (ViewBag.prodcount == 0)
-            {
-                <h5>Found no User products</h5>
-            }
-            else if (ViewBag.prodcount == 1)
-            {
-                <h5>Found 1 product</h5>
+<form id="form2" runat="server">
 
-            }
-            else
-            {
-                <h5>Found @ViewBag.prodcount products</h5>
-            }
-            foreach (var item in ViewBag.userproducts)
-            {
-                <dl class="dl-horizontal">
-                    <dt>
-                        @Html.ActionLink("UserProfile", "UserDetails", "Users", new { id = item.UserId }, null)
-                        @item.User.FirstName
-                    </dt>
+    <p>
+        <a><asp:LinkButton ID="mapbtn" runat="server"><b>Hide</b></asp:LinkButton> </a>
+    </p>
+    <p>
+        <div id="directions-panel"></div>
+        <div id="map-canvas" style="width:600px;height:400px"></div>
 
-                    <dt>
-                        @item.Name
-                    </dt>
-                    <dt>
-                        @item.Price
-                    </dt>
-                </dl>
+    </p>
+
+</form>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#lnkbtn").click(function () {
+            if ($('#divreg').is(":hidden")) {
+                $('#divreg').show(500);
+                document.getElementById('lnkbtn').innerHTML = "Hide";
+            } else {
+                $("#divreg").hide(500);
+                document.getElementById('lnkbtn').innerHTML = "Show";
             }
-        }
-    </div>*@
+        });
+        $("#mapbtn").click(function () {
+            if ($('#map-canvas').is(":hidden")) {
+                $('#map-canvas').show(500);
+                $('#directions-panel').show(500);
+                document.getElementById('mapbtn').innerHTML = "Hide";
+            } else {
+                $("#map-canvas").hide(500);
+                $('#directions-panel').hide(500);
+                document.getElementById('mapbtn').innerHTML = "Show";
+            }
+        });
+    });
+</script>
 
 
 <div id="control">
@@ -170,11 +202,6 @@
     </select>
 </div>
 
-
-<div id="directions-panel"></div>
-<div id="map-canvas" style="width:600px;height:400px"></div>
-
-@*<div id="mydiv"></div>*@
 
 
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>

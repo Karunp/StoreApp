@@ -283,6 +283,34 @@
     <Compile Include="Migrations\201411032111379_newstorecolumn.Designer.cs">
       <DependentUpon>201411032111379_newstorecolumn.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201411121950110_newmodelforrating.cs" />
+    <Compile Include="Migrations\201411121950110_newmodelforrating.Designer.cs">
+      <DependentUpon>201411121950110_newmodelforrating.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201411122008400_newmodelforrat.cs" />
+    <Compile Include="Migrations\201411122008400_newmodelforrat.Designer.cs">
+      <DependentUpon>201411122008400_newmodelforrat.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201411131940279_updatedvote.cs" />
+    <Compile Include="Migrations\201411131940279_updatedvote.Designer.cs">
+      <DependentUpon>201411131940279_updatedvote.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201411132018251_updatedvot.cs" />
+    <Compile Include="Migrations\201411132018251_updatedvot.Designer.cs">
+      <DependentUpon>201411132018251_updatedvot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201411132128159_updatedvo.cs" />
+    <Compile Include="Migrations\201411132128159_updatedvo.Designer.cs">
+      <DependentUpon>201411132128159_updatedvo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201411132147579_updatedv.cs" />
+    <Compile Include="Migrations\201411132147579_updatedv.Designer.cs">
+      <DependentUpon>201411132147579_updatedv.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201411182034148_fuku.cs" />
+    <Compile Include="Migrations\201411182034148_fuku.Designer.cs">
+      <DependentUpon>201411182034148_fuku.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AllowCrossSiteJsonAttribute.cs" />
@@ -408,6 +436,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="images\" />
     <Folder Include="Views\ShoppingCarts\" />
   </ItemGroup>
   <ItemGroup>
@@ -483,6 +512,27 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201411032111379_newstorecolumn.resx">
       <DependentUpon>201411032111379_newstorecolumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201411121950110_newmodelforrating.resx">
+      <DependentUpon>201411121950110_newmodelforrating.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201411122008400_newmodelforrat.resx">
+      <DependentUpon>201411122008400_newmodelforrat.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201411131940279_updatedvote.resx">
+      <DependentUpon>201411131940279_updatedvote.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201411132018251_updatedvot.resx">
+      <DependentUpon>201411132018251_updatedvot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201411132128159_updatedvo.resx">
+      <DependentUpon>201411132128159_updatedvo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201411132147579_updatedv.resx">
+      <DependentUpon>201411132147579_updatedv.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201411182034148_fuku.resx">
+      <DependentUpon>201411182034148_fuku.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

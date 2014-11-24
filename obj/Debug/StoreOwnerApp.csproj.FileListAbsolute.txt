@@ -88,3 +88,10 @@ C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\bi
 C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\bin\PagedList.xml
 C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\obj\Debug\StoreOwnerApp.Migrations.newstorecolumn.resources
 C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\bin\GoogleMaps.LocationServices.dll
+C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\obj\Debug\StoreOwnerApp.Migrations.newmodelforrating.resources
+C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\obj\Debug\StoreOwnerApp.Migrations.newmodelforrat.resources
+C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\obj\Debug\StoreOwnerApp.Migrations.updatedvote.resources
+C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\obj\Debug\StoreOwnerApp.Migrations.updatedvot.resources
+C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\obj\Debug\StoreOwnerApp.Migrations.updatedvo.resources
+C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\obj\Debug\StoreOwnerApp.Migrations.updatedv.resources
+C:\Users\PC\documents\visual studio 2013\Projects\StoreOwnerApp\StoreOwnerApp\obj\Debug\StoreOwnerApp.Migrations.fuku.resources

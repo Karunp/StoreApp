@@ -56,6 +56,7 @@ namespace StoreOwnerApp.Models
 
         public System.Data.Entity.DbSet<StoreOwnerApp.Models.Category> Categories { get; set; }
 
+       
         //public System.Data.Entity.DbSet<StoreOwnerApp.Models.User> ApplicationUsers { get; set; }
     }
 }

@@ -17,7 +17,8 @@ namespace StoreOwnerApp.Models
         public string phone { get; set; }
         public string state { get; set; }
         public string store_id { get; set; }
-
+        public int Rating { get; set; }
+        public int TotalRaters { get; set; }
        
     }
 

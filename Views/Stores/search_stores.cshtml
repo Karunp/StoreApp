@@ -48,16 +48,11 @@
 
         <table id="example" class="table table-striped">
 
-            <tr>
-              
-                <th>
-                    Name
-                </th>
+            <tr>              
+                <th>Name</th>               
               
                 <th>Distance(miles)</th>
-
             </tr>
-
 
             @foreach (dynamic item in ViewBag.model)
             {
@@ -66,12 +61,13 @@
                     <td>
                         @item.name
                     </td>
+                    <td>                        
+                    </td>             
                     <td>@ViewBag.distance</td>
                     <td>@CalculateDistance(Convert.ToDouble(ViewBag.mylat),Convert.ToDouble(ViewBag.mylng), Convert.ToDouble(item.lat), Convert.ToDouble(item.lng))</td>
                    
                     <td>
-                        @Html.ActionLink("ViewStore", "search_in_store", new { storeID = item.store_id, productname = ViewBag.productname, fromprice = ViewBag.fromprice, toprice = ViewBag.toprice, lat = item.lat, lng = item.lng })
-                        @*@item.store_id*@
+                        @Html.ActionLink("Store Details", "location_details", new { storeID = item.id }) | @Html.ActionLink("ViewStore", "search_in_store", new { storeID = item.store_id, productname = ViewBag.productname, fromprice = ViewBag.fromprice, toprice = ViewBag.toprice, lat = item.lat, lng = item.lng, mystoreid= item.id })
                     </td>      
 
                 </tr>

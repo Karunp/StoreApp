@@ -11,10 +11,12 @@ namespace StoreOwnerApp.Models
     {
         [Key]
         public int StoreId { get; set; }
+        public string storenum { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
         public string Prodname { get; set; }
         public string[] prodarray { get; set; }
+        public string Votes { get; set; }
 
         public virtual User User { get; set; }
         public virtual IEnumerable<Newtonsoft.Json.Linq.JToken> Products { get; set; }

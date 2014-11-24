@@ -70,6 +70,8 @@ namespace StoreOwnerApp.Controllers
             // Go back to the main store page for more shopping
             return RedirectToAction("Index");
         }
+       
+      
 
         public ActionResult FindStores()
         {
@@ -159,15 +161,17 @@ namespace StoreOwnerApp.Controllers
             return View(model);
         }
 
-        public  ActionResult location_details()
+        public  ActionResult location_details(string storeID, double? rating)
         {
+           
+           
             //instantiate new client and model
             var client = new HttpClient();
             var model = new List<Location>();
 
             //Multiple locations
             //send get request to specified Uri as an asynchorous operation
-            var task = client.GetAsync("http://api.goodzer.com/products/v0.1/location_details/?locationId=fKAKgREd&apiKey=f7d93213c281896d44c093a36a4f544a")
+            var task = client.GetAsync("http://api.goodzer.com/products/v0.1/location_details/?locationId=" +storeID+ "&apiKey=f7d93213c281896d44c093a36a4f544a")
                 .ContinueWith((taskwithmsg) =>
                 {
                     var response = taskwithmsg.Result;
@@ -178,16 +182,20 @@ namespace StoreOwnerApp.Controllers
 
                     //Skip first index to access JProperties of "location" index - bind to model
                     model = (jsonObject.Children().Skip(1).Cast<JProperty>()
-                                        .Select(j => new Location { 
+                                        .Select(j => new Location {
+                                            id = j.Value["id"].ToString(),
+                                            store_id = j.Value["store_id"].ToString(),                                            
                                             city = j.Value["city"].ToString(),
                                             address = j.Value["address"].ToString(),
                                             name = j.Value["name"].ToString(),
                                             lat = j.Value["lat"].ToString(),
-                                            lng = j.Value["lng"].ToString()
+                                            lng = j.Value["lng"].ToString(),
+                                            phone = j.Value["phone"].ToString()                                            
                                         })).ToList();                   
-
                 });
             task.Wait();
+            ViewBag.storeid = storeID;
+            ViewBag.myid = model.Where(a => a.store_id == storeID).Select(a => a.id);
             return View(model);
         }
 
@@ -238,6 +246,7 @@ namespace StoreOwnerApp.Controllers
                                         select new Location
                                         {
                                             name = jo["name"].ToString(),
+                                            id = jo["id"].ToString(),
                                             store_id = jo["store_id"].ToString(),
                                             lat = jo["lat"].ToString(),
                                             lng = jo["lng"].ToString()
@@ -258,7 +267,7 @@ namespace StoreOwnerApp.Controllers
             return View(model);
         }
 
-        public ActionResult search_in_store(string storeID, string productname,  decimal? fromprice, decimal? toprice, int? page, string lat, string lng)
+        public ActionResult search_in_store(string storeID, string mystoreid, string productname,  decimal? fromprice, decimal? toprice, int? page, string lat, string lng)
         {                      
             //instantiate new client and model
             var client = new HttpClient();
@@ -311,12 +320,41 @@ namespace StoreOwnerApp.Controllers
                 ViewBag.storelng = lng;
                 ViewBag.productname = productname;
                 ViewBag.storeID = storeID;
+                
                 ViewBag.fromprice = fromprice;
                 ViewBag.toprice = toprice;
 
             }
-            //send get request to specified Uri as an asynchorous operation
+            var mystoremodel = new Location();
 
+            //send get request to specified Uri as an asynchorous operation
+            var mystore = client.GetAsync("http://api.goodzer.com/products/v0.1/location_details/?locationId=" + mystoreid + "&apiKey=f7d93213c281896d44c093a36a4f544a")
+                .ContinueWith((taskwithmsg) =>
+                {
+                    var response = taskwithmsg.Result;
+                    //process content
+                    var jsonTask = response.Content.ReadAsAsync<JObject>();
+                    jsonTask.Wait();
+                    var jsonObject = jsonTask.Result;
+
+                    //Skip first index to access JProperties of "location" index - bind to model
+                    mystoremodel = (jsonObject.Children().Skip(1).Cast<JProperty>()
+                                        .Select(j => new Location
+                                        {
+                                            id = j.Value["id"].ToString(),
+                                            store_id = j.Value["store_id"].ToString(),
+                                            city = j.Value["city"].ToString(),
+                                            address = j.Value["address"].ToString(),
+                                            name = j.Value["name"].ToString(),
+                                            lat = j.Value["lat"].ToString(),
+                                            lng = j.Value["lng"].ToString(),
+                                            phone = j.Value["phone"].ToString()
+                                        })).FirstOrDefault();
+                });
+            mystore.Wait();
+            //send get request to specified Uri as an asynchorous operation
+            ViewBag.mystore = mystoremodel;
+            ViewBag.mystoreid = mystoremodel.id;
             return View(model);
         }
 
@@ -648,10 +686,6 @@ namespace StoreOwnerApp.Controllers
             db.SaveChanges();
             return RedirectToAction("Index");
         }
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        //::  This function converts decimal degrees to radians             :::
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-       
         protected override void Dispose(bool disposing)
         {
             if (disposing)

@@ -1,9 +1,4 @@
 ﻿
-@{
-    ViewBag.Title = "location_details";
-}
-
-<h2>location_details</h2>
 @foreach (dynamic item in Model)
 {
     <li>
@@ -14,97 +9,18 @@
             @item.store_id
         </h5>
         <h5>
+            @item.id
+        </h5>
+        <h5>
             @item.lat
         </h5>
         <h5>
             @item.lng
         </h5>
+        <h5>
+            @item.phone
+        </h5>
     </li>
 }
-
 <script src="//code.jquery.com/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
-<div id="map-canvas" style="width:600px;height:400px"></div>
-
-<script>
-    $(document).ready(function () {
-        //declare a variable
-        var myMarkers = [];
-
-        $.ajax({
-            async: true,
-            type: "GET",
-            dataType: "application/json",
-            data: '{}',
-            url: 'http://localhost:2971/Stores/location_details_api',
-            
-            success:function(result){
-                //get address from controller action.....
-                myMarkers = result.model;
-            }
-
-        });
-        //init google map
-        function googleMap() {
-            var mapOptions = {
-                center: new google.maps.LatLng(myMarkers["lat"], myMarkers["lng"]),
-                zoom: 2,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            var infoWindow = new google.maps.InfoWindow();
-            var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-            for (i = 0; i < myMarkers.length; i++) {
-                data = myMarkers[i];
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(data.lat, data.lng),
-                    map: map
-                });
-                (function (marker, data) {
-                    google.maps.event.addListener(marker, "click", function (e) {
-                        infoWindow.setContent(data.Description);
-                        infoWindow.open(map, marker);
-                    });
-                })(marker, data);
-            }
-        }
-        google.maps.event.addDomListener(window, 'load', googleMap);
-
-    })
-
-
-    //var locations = [];
-    //locations.push();
-    //    function initialize() {
-    //        var mapOptions = {
-    //            zoom: 8,
-    //            center: new google.maps.LatLng(-34.397, 150.644)
-    //        }
-    //        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-    //        setMarkers(map, markers);
-    //    }
-
-    //    //markers = <%= _markers %>;
-
-    //    function setMarkers(map, locations) {
-    //        shape = {
-    //            coords: [1, 1, 1, 20, 18, 20, 18, 1],
-    //            type: 'poly'
-    //        };
-
-    //        for (var i = 0; i < locations.length; i++) {
-    //            var marker = locations[i];
-    //            var myLatLng = new google.maps.LatLng(marker[1], marker[2]);
-    //            var marker = new google.maps.Marker({
-    //                position: myLatLng,
-    //                map: map,
-    //                icon: DecideImage(marker[4]),
-    //                shape: shape,
-    //                title: marker[0],
-    //                zIndex: marker[3]
-    //            });
-    //        }
-    //    }
-
-    //    google.maps.event.addDomListener(window, 'load', initialize);
-
-</script>
